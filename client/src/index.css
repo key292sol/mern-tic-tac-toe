@@ -1,0 +1,266 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Open Sans', 'Helvetica Neue', sans-serif;
+  text-align: center;
+}
+
+body {
+  --white-op50: rgba(255, 255, 255, 0.50);
+  --white-op75: rgba(255, 255, 255, 0.75);
+
+  padding: 0;
+  margin: 0;
+
+  font-size: 2rem;
+
+  height: 100vh;
+  background: linear-gradient(180deg, rgba(184, 68, 255, 0.32) 0%, #6903A8 100%);
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+header a {
+  text-decoration: none;
+  color: #0004;
+}
+
+header a:hover {
+  color: #000A;
+  text-decoration: underline;
+}
+
+.main-container {
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0 2rem;
+  gap: 2rem;
+}
+
+@media screen and (width <= 500px){
+  .main-container {
+    gap: 1rem;
+  }
+}
+
+.heading {
+  font-size: 4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.home-button {
+  width: 100%;
+  max-width: 14ch;
+  padding: 0.8rem;
+
+  text-align: center;
+  font-size: 2rem;
+
+  border: none;
+  border-radius: 20rem;
+
+  background: rgba(255, 255, 255, 0.50);
+  color: #000;
+  cursor: pointer;
+}
+
+.home-button:hover,
+.home-button:focus {
+  outline: 4px solid rgba(105, 3, 168, 0.80);
+  background: var(--white-op75);
+}
+
+
+.join-room-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.join-room-form input, .join-room-form button {
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+  border: none;
+  border-radius: 5rem;
+  background-color: #ffffff34;
+  box-shadow: 0px 5px 5px hsl(302, 72%, 25%);
+}
+
+.join-room-form input {
+  color: #000;
+  border-bottom: 2px solid hsl(302, 72%, 25%);
+}
+
+.join-room-form input::-webkit-input-placeholder {
+  color: #0008;
+}
+
+.join-room-form input:focus {
+  border: none;
+  outline: none;
+}
+
+.join-room-form button {
+  /* background-color: #FF2DF7; */
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 2px solid hsl(302, 72%, 25%);
+  cursor: pointer;
+}
+
+.join-room-form button:hover {
+  background-color: hsl(302, 72%, 70%);
+}
+
+
+
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1/1;
+
+  padding: 10px;
+  gap: 10px;
+
+  border: 1px solid rgba(105, 3, 168, 0.80);
+  background: rgba(105, 3, 168, 0.20);
+}
+
+.grid-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+  padding: 0%;
+  font-size: 7.5rem;
+  border: none;
+  cursor: pointer;
+  background: var(--white-op50);
+}
+
+.grid-cell:disabled {
+  cursor: default;
+}
+
+.grid-cell:hover {
+  background: var(--white-op75);
+}
+
+.grid-cell.filled {
+  background: white;
+}
+
+.grid-cell.O {
+  color: #FF2DF7;
+}
+
+.grid-cell.X {
+  color: #F00;
+}
+
+.rematch-button {
+  font-size: 2rem;
+  padding: 0.5rem 2rem;
+  background-color: #FF2DF7;
+  text-transform: uppercase;
+  border: 2px solid hsl(302, 72%, 25%);
+  border-radius: 5rem;
+  cursor: pointer;
+}
+
+.rematch-button:hover {
+  background-color: hsl(302, 91%, 75%);
+}
+
+
+@media all and (width <= 500px) {
+  .game-grid {
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .grid-cell {
+    font-size: 5rem;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.loading {
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loading div {
+  width: 1rem;
+  border-radius: 5rem;
+  background-color: var(--white-op50);
+
+  animation: 0.6s loading linear infinite alternate;
+}
+
+.loading div:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading div:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loading div:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.loading div:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.loading div:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+@keyframes loading {
+  from {
+    height: 1rem;
+  }
+
+  to {
+    height: 5rem;
+  }
+}
