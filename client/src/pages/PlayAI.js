@@ -2,32 +2,27 @@ import React, { useEffect, useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import Loading from '../components/Loading';
 
-function PlayLocal({ socket }) {
+function PlayAI({ socket }) {
 	const [hasGameStarted, setHasGameStarted] = useState(false);
 
 	const [gameGrid, setGameGrid] = useState(null);
 	const [curPlayer, setCurPlayer] = useState(null);
 	const [gameResult, setGameResult] = useState(undefined);
 	const [roomId, setRoomId] = useState(null);
+	const [mySign, setMySign] = useState(null);
 
 	const getNewCurPlayer = (player) => (player === 'O' ? 'X' : 'O');
 
-	const setDefaultStates = () => {
-		setHasGameStarted(true);
-		setGameGrid([
-			['', '', ''],
-			['', '', ''],
-			['', '', ''],
-		]);
-		setCurPlayer('O');
-		setGameResult(undefined);
-	};
-
 	useEffect(() => {
 		if (socket) {
-			socket.emit('create-local-room');
-			socket.on('room-id', (room_id) => {
-				setDefaultStates();
+			socket.emit('create-ai-room');
+			socket.on('room-id', ({ room_id, move, grid }) => {
+				console.log(move);
+				setMySign(move);
+				setHasGameStarted(true);
+				setGameGrid(grid);
+				setCurPlayer(move);
+				setGameResult(undefined);
 				setRoomId(room_id);
 			});
 		}
@@ -36,33 +31,30 @@ function PlayLocal({ socket }) {
 	const handleClick = (row, col) => {
 		if (socket) {
 			let gridCopy = [[...gameGrid[0]], [...gameGrid[1]], [...gameGrid[2]]];
-			gridCopy[row][col] = curPlayer;
+			gridCopy[row][col] = mySign;
 
 			setCurPlayer(getNewCurPlayer);
 			setGameGrid(gridCopy);
-			socket.emit('play-local', { roomId, row, col });
+			socket.emit('play-ai', { roomId, row, col });
 		} else {
 			alert("Couldn't connect to server");
 		}
 	};
 
 	const gameEnded = (result) => {
-		setGameResult(result);
+		// setGameResult(result);
 		let msg;
-		switch (result) {
-			case 'D':
-				msg = 'The game was a draw';
-				break;
-			case 'X':
-				msg = 'Winner: X';
-				break;
-			case 'O':
-				msg = 'Winner: O';
-				break;
-			default:
-				break;
+
+		if (result === mySign) {
+			console.log(result, mySign);
+			msg = 'You won!!';
+		} else if (result === 'D') {
+			msg = 'The game was a draw';
+		} else {
+			msg = 'You lose';
 		}
 
+		setGameResult(msg);
 		alert(msg);
 	};
 
@@ -77,7 +69,7 @@ function PlayLocal({ socket }) {
 
 					// gameGrid[row][col] =  curPlayer ;
 					setGameGrid(curGameGridState);
-					// setCurPlayer(getNewCurPlayer);
+					setCurPlayer(getNewCurPlayer);
 				}
 			);
 		}
@@ -93,10 +85,20 @@ function PlayLocal({ socket }) {
 			) : (
 				<div className='main-container'>
 					{gameResult ? (
-						<h2>{gameResult === 'D' ? 'DRAW' : `Winner: ${gameResult}`}</h2>
+						<h2>
+							{gameResult}
+							{/* {gameResult === 'D' ? (
+								'Draw'
+							) : (
+								<>{gameResult === mySign ? 'You won!!' : 'AI won'}</>
+							)} */}
+						</h2>
 					) : (
 						<h2>
-							Current: <span>{curPlayer}</span>
+							Current:{' '}
+							<span>
+								{curPlayer} {curPlayer === mySign ? '(You)' : '(AI)'}
+							</span>
 						</h2>
 					)}
 					<GameGrid gridState={gameGrid} handleClick={handleClick} />
@@ -114,4 +116,4 @@ function PlayLocal({ socket }) {
 	);
 }
 
-export default PlayLocal;
+export default PlayAI;

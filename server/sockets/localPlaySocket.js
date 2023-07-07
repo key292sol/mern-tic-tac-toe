@@ -1,19 +1,10 @@
-const crypto = require('crypto');
-const GameState = require('../game/GameState');
-
-const generateRoomId = () => {
-	let roomId;
-	do {
-		roomId = crypto.randomBytes(3).toString('hex').toUpperCase();
-	} while (roomId in global.roomToGameMap);
-	return roomId;
-};
+const { generateRoomId, getNewGame } = require('./funcs');
 
 module.exports.localPlaySocket = (io, socket) => {
 	socket.on('create-local-room', () => {
 		const roomId = generateRoomId();
 
-		global.roomToGameMap[roomId] = new GameState();
+		global.roomToGameMap[roomId] = getNewGame();
 		socket.room = roomId;
 
 		socket.join(roomId);
@@ -38,6 +29,6 @@ module.exports.localPlaySocket = (io, socket) => {
 	});
 
 	socket.on('restart', () => {
-		global.roomToGameMap[roomId] = new GameState();
+		global.roomToGameMap[roomId] = getNewGame();
 	});
 };

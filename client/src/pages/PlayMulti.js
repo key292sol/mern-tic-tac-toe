@@ -77,12 +77,10 @@ function PlayMulti({ socket }) {
 			msg = 'You won!!';
 		}
 		alert(msg);
-		// console.log(msg);
 	};
 
 	useEffect(() => {
 		if (hasGameStarted) {
-			console.log('INIT move played');
 			socket.on(
 				'move-played',
 				({ movePlayed, row, col, result, whoPlayed, curGameGridState }) => {

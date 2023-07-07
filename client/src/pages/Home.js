@@ -19,7 +19,7 @@ function Home({ socket, setSocket }) {
 			<button
 				className='home-button'
 				onClick={(e) => {
-					navigate('/');
+					navigate('/play-ai');
 				}}
 			>
 				Play with AI

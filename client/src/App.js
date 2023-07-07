@@ -15,6 +15,7 @@ import PlayLocal from './pages/PlayLocal';
 import { useState } from 'react';
 import Header from './components/Header';
 import PlayMulti from './pages/PlayMulti';
+import PlayAI from './pages/PlayAI';
 
 function App() {
 	const [socket, setSocket] = useState(undefined);
@@ -41,6 +42,7 @@ function App() {
 						path='/play-local'
 						element={<PlayLocal socket={socket} />}
 					></Route>
+					<Route path='/play-ai' element={<PlayAI socket={socket} />}></Route>
 					<Route
 						path='/room/create'
 						element={<CreateRoom socket={socket} />}

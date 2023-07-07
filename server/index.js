@@ -6,6 +6,7 @@ const socket = require('socket.io');
 const { gameRoutes } = require('./routes/gameRoutes');
 const { multiPlayerSocket } = require('./sockets/multiPlayerSocket');
 const { localPlaySocket } = require('./sockets/localPlaySocket');
+const { aiPlaySocket } = require('./sockets/aiPlaySocket');
 
 const app = express();
 
@@ -31,6 +32,7 @@ io.on('connection', (socket) => {
 	console.log('Socket connected', socket.id);
 
 	localPlaySocket(io, socket);
+	aiPlaySocket(io, socket);
 	multiPlayerSocket(io, socket);
 
 	socket.on('disconnect', () => {

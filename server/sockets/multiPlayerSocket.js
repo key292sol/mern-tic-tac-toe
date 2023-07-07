@@ -1,12 +1,4 @@
-const crypto = require('crypto');
-
-const generateRoomId = () => {
-	let roomId;
-	do {
-		roomId = crypto.randomBytes(3).toString('hex').toUpperCase();
-	} while (roomId in global.roomToGameMap);
-	return roomId;
-};
+const { generateRoomId, getNewGame } = require('./funcs');
 
 module.exports.multiPlayerSocket = (io, socket) => {
 	socket.on('create-room', () => {
@@ -25,7 +17,7 @@ module.exports.multiPlayerSocket = (io, socket) => {
 		if (!roomExists) {
 			socket.emit('not-joined', false);
 		} else {
-			global.roomToGameMap[roomId] = new GameState();
+			global.roomToGameMap[roomId] = getNewGame();
 			socket.room = roomId;
 
 			socket.join(roomId);
