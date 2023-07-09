@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-function Home({ socket, setSocket }) {
+function Home() {
 	const navigate = useNavigate();
 
 	return (

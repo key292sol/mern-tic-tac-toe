@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import Loading from '../components/Loading';
+import { io } from 'socket.io-client';
 
-function PlayLocal({ socket }) {
+import { HOST } from '../utils/APIRoutes';
+
+function PlayLocal() {
+	const [socket, setSocket] = useState(undefined);
+
 	const [hasGameStarted, setHasGameStarted] = useState(false);
 
 	const [gameGrid, setGameGrid] = useState(null);
@@ -24,6 +29,10 @@ function PlayLocal({ socket }) {
 	};
 
 	useEffect(() => {
+		setSocket(io(HOST));
+	}, []);
+
+	useEffect(() => {
 		if (socket) {
 			socket.emit('create-local-room');
 			socket.on('room-id', (room_id) => {
@@ -31,7 +40,7 @@ function PlayLocal({ socket }) {
 				setRoomId(room_id);
 			});
 		}
-	}, []);
+	}, [socket]);
 
 	const handleClick = (row, col) => {
 		if (socket) {
@@ -64,6 +73,13 @@ function PlayLocal({ socket }) {
 		}
 
 		alert(msg);
+	};
+
+	const resetGame = () => {
+		if (window.confirm('Reset game?')) {
+			socket.emit('restart-local', roomId);
+			setDefaultStates();
+		}
 	};
 
 	useEffect(() => {
@@ -106,7 +122,9 @@ function PlayLocal({ socket }) {
 							gap: '1rem',
 						}}
 					>
-						<button className='rematch-button'>Rematch</button>
+						<button className='rematch-button' onClick={resetGame}>
+							Restart
+						</button>
 					</div>
 				</div>
 			)}

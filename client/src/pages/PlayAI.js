@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import Loading from '../components/Loading';
+import { io } from 'socket.io-client';
 
-function PlayAI({ socket }) {
+import { HOST } from '../utils/APIRoutes';
+
+function PlayAI() {
+	const [socket, setSocket] = useState(undefined);
+
 	const [hasGameStarted, setHasGameStarted] = useState(false);
 
 	const [gameGrid, setGameGrid] = useState(null);
@@ -14,39 +19,39 @@ function PlayAI({ socket }) {
 	const getNewCurPlayer = (player) => (player === 'O' ? 'X' : 'O');
 
 	useEffect(() => {
+		setSocket(io(HOST));
+	}, []);
+
+	useEffect(() => {
 		if (socket) {
 			socket.emit('create-ai-room');
-			socket.on('room-id', ({ room_id, move, grid }) => {
-				console.log(move);
+			socket.on('room-id', ({ room_id }) => {
+				setRoomId(room_id);
+			});
+
+			socket.on('game-data', ({ move, grid }) => {
 				setMySign(move);
 				setHasGameStarted(true);
 				setGameGrid(grid);
 				setCurPlayer(move);
 				setGameResult(undefined);
-				setRoomId(room_id);
 			});
 		}
-	}, []);
+	}, [socket]);
 
 	const handleClick = (row, col) => {
-		if (socket) {
-			let gridCopy = [[...gameGrid[0]], [...gameGrid[1]], [...gameGrid[2]]];
-			gridCopy[row][col] = mySign;
+		let gridCopy = [[...gameGrid[0]], [...gameGrid[1]], [...gameGrid[2]]];
+		gridCopy[row][col] = mySign;
 
-			setCurPlayer(getNewCurPlayer);
-			setGameGrid(gridCopy);
-			socket.emit('play-ai', { roomId, row, col });
-		} else {
-			alert("Couldn't connect to server");
-		}
+		setCurPlayer(getNewCurPlayer);
+		setGameGrid(gridCopy);
+		socket.emit('play-ai', { roomId, row, col });
 	};
 
 	const gameEnded = (result) => {
-		// setGameResult(result);
 		let msg;
 
 		if (result === mySign) {
-			console.log(result, mySign);
 			msg = 'You won!!';
 		} else if (result === 'D') {
 			msg = 'The game was a draw';
@@ -58,18 +63,23 @@ function PlayAI({ socket }) {
 		alert(msg);
 	};
 
+	const resetGame = () => {
+		if (window.confirm('Restart game?')) {
+			socket.emit('restart-ai', roomId);
+		}
+	};
+
 	useEffect(() => {
 		if (hasGameStarted) {
 			socket.on(
 				'move-played',
 				({ movePlayed, row, col, result, whoPlayed, curGameGridState }) => {
+					setGameGrid(curGameGridState);
+					setCurPlayer(getNewCurPlayer);
+
 					if (result) {
 						gameEnded(result);
 					}
-
-					// gameGrid[row][col] =  curPlayer ;
-					setGameGrid(curGameGridState);
-					setCurPlayer(getNewCurPlayer);
 				}
 			);
 		}
@@ -85,14 +95,7 @@ function PlayAI({ socket }) {
 			) : (
 				<div className='main-container'>
 					{gameResult ? (
-						<h2>
-							{gameResult}
-							{/* {gameResult === 'D' ? (
-								'Draw'
-							) : (
-								<>{gameResult === mySign ? 'You won!!' : 'AI won'}</>
-							)} */}
-						</h2>
+						<h2>{gameResult}</h2>
 					) : (
 						<h2>
 							Current:{' '}
@@ -108,7 +111,9 @@ function PlayAI({ socket }) {
 							gap: '1rem',
 						}}
 					>
-						<button className='rematch-button'>Rematch</button>
+						<button className='rematch-button' onClick={resetGame}>
+							Rematch
+						</button>
 					</div>
 				</div>
 			)}

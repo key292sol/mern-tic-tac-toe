@@ -12,26 +12,12 @@ function JoinRoom({ socket }) {
 
 		setIsJoining(true);
 
-		if (!socket) {
-			alert('There was a problem connecting to server');
-			return;
-		}
-
 		socket.emit('join-room', roomId);
 
 		socket.on('game-start', ({ gameStart }) => {
 			navigate(`/room/play?playas=O&room-id=${roomId}`);
 		});
 	};
-
-	/* socket.on('game-start', ({ gameStart, playAs }) => {
-		navigate(`/room?playas=${playAs}`);
-	});
-
-	socket.on('not-joined', () => {
-		alert("Couldn't find the room ID specified");
-		setIsJoining(false);
-	}); */
 
 	return (
 		<div className='main-container'>

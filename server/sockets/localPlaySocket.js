@@ -28,7 +28,7 @@ module.exports.localPlaySocket = (io, socket) => {
 		});
 	});
 
-	socket.on('restart', () => {
+	socket.on('restart-local', (roomId) => {
 		global.roomToGameMap[roomId] = getNewGame();
 	});
 };

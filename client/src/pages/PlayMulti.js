@@ -43,17 +43,12 @@ function PlayMulti({ socket }) {
 	}, []);
 
 	const handleClick = (row, col) => {
-		if (socket) {
-			// gameGrid[row][col] = mySign;
-			let gridCopy = [[...gameGrid[0]], [...gameGrid[1]], [...gameGrid[2]]];
-			gridCopy[row][col] = mySign;
+		let gridCopy = [[...gameGrid[0]], [...gameGrid[1]], [...gameGrid[2]]];
+		gridCopy[row][col] = mySign;
 
-			setCurPlayer(getNewCurPlayer);
-			setGameGrid(gridCopy);
-			socket.emit('play', { roomId, row, col });
-		} else {
-			alert("Couldn't connect to server");
-		}
+		setCurPlayer(getNewCurPlayer);
+		setGameGrid(gridCopy);
+		socket.emit('play', { roomId, row, col });
 	};
 
 	const gameEnded = (result) => {
