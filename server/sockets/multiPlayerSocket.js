@@ -54,5 +54,16 @@ module.exports.multiPlayerSocket = (io, socket) => {
 		});
 	});
 
-	socket.on('restart', () => {});
+	socket.on('restart', ({ roomId }) => {
+		const game = global.roomToGameMap[roomId];
+		game.incRestart();
+		if (game.getRestartCount() === 2) {
+			const newGame = getNewGame();
+			newGame.setPlayerX(game.getPlayerO());
+			newGame.setPlayerO(game.getPlayerX());
+			global.roomToGameMap[roomId] = newGame;
+
+			io.sockets.in(roomId).emit('restart', { grid: game.board });
+		}
+	});
 };

@@ -21,6 +21,9 @@ function PlayMulti() {
 	const [myUid, setMyUid] = useState(null);
 	const [mySign, setMySign] = useState(undefined);
 
+	// const [rematchButtonMsg, setRematchMsg] = useState('Restart');
+	const [rematchSent, setRematchSent] = useState(false);
+
 	const [searchParams, setSearchParams] = useSearchParams();
 	// const mySign = searchParams.get('playas');
 	const roomId = searchParams.get('room-id');
@@ -40,6 +43,9 @@ function PlayMulti() {
 	useEffect(() => {
 		if (socket) {
 			socket.emit('add-to-room', { roomId });
+			socket.on('restart', ({ grid }) => {
+				window.location.reload();
+			});
 		}
 	}, [socket]);
 
@@ -76,6 +82,12 @@ function PlayMulti() {
 		setCurPlayer(getNewCurPlayer);
 		setGameGrid(gridCopy);
 		socket.emit('play', { roomId, row, col });
+	};
+
+	const handleRematch = () => {
+		socket.emit('restart', { roomId });
+		// setRematchMsg('Waiting for opponent response');
+		setRematchSent(true);
 	};
 
 	const gameEnded = (result) => {
@@ -158,7 +170,13 @@ function PlayMulti() {
 							gap: '1rem',
 						}}
 					>
-						<button className='rematch-button'>Rematch</button>
+						<button
+							className='rematch-button'
+							onClick={() => handleRematch()}
+							disabled={rematchSent}
+						>
+							{rematchSent ? 'Restart Waiting' : 'Rematch'}
+						</button>
 					</div>
 				</div>
 			)}

@@ -15,6 +15,16 @@ module.exports = class GameState {
 		};
 		this.curPlayer = 'O';
 		this.gameResult = undefined;
+
+		this.restartCount = 0;
+	}
+
+	incRestart() {
+		this.restartCount += 1;
+	}
+
+	getRestartCount() {
+		return this.restartCount;
 	}
 
 	setPlayerX(player) {
