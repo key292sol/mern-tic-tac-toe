@@ -1,28 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import Loading from '../components/Loading';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
-function CreateRoom({ socket }) {
+import { HOST, GetNewUidRoute } from '../utils/APIRoutes';
+import axios from 'axios';
+
+function CreateRoom() {
+	const [socket, setSocket] = useState(undefined);
+	const [myUid, setMyUid] = useState(null);
+
 	const [roomId, setRoomId] = useState(undefined);
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (socket) {
-			socket.emit('create-room');
+		setSocket(io(HOST));
+
+		const localUid = localStorage.getItem('ttt-uid');
+		// const localUid = localStorage['ttt-uid'];
+		console.log(localUid);
+		if (!localUid) {
+			// Get new uid
+			(async () => {
+				try {
+					const res = await axios.get(GetNewUidRoute);
+					const uid = res.data.uid;
+					setMyUid(uid);
+					localStorage.setItem('ttt-uid', uid);
+				} catch (error) {
+					console.error(error);
+				}
+			})();
+		} else {
+			setMyUid(localUid);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (socket && myUid) {
+			socket.emit('create-room', { myUid });
 			let URL;
 			socket.on('room-id', (room_id) => {
 				setRoomId(room_id);
-				URL = `/room/play?playas=X&room-id=${room_id}`;
+				URL = `/room/play?room-id=${room_id}`;
 			});
 
 			socket.on('game-start', ({ gameStart }) => {
 				navigate(URL);
 			});
-			/* socket.on('game-start', ({ gameStart, playAs }) => {
-			navigate(`/room?playas=${playAs}`);
-		}); */
 		}
-	}, []);
+	}, [socket, myUid]);
 
 	return (
 		<div

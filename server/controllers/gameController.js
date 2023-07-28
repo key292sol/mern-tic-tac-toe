@@ -1,13 +1,10 @@
-module.exports.getGameDetails = (req, res, next) => {
-	// console.log(req.body);
-	// console.log(global.roomToGameMap);
+// const nanoid = require('nanoid');
 
-	const { roomId } = req.body;
+module.exports.getGameDetails = (req, res, next) => {
+	const { roomId, myUid } = req.body;
 	const game = global.roomToGameMap[roomId];
 
 	if (game === undefined) {
-		console.log(roomId);
-		console.log(global.roomToGameMap);
 		return res.json({ gameFound: false });
 	}
 
@@ -15,6 +12,16 @@ module.exports.getGameDetails = (req, res, next) => {
 		gameFound: true,
 		gameGrid: game.board,
 		curPlayer: game.curPlayer,
+		playas: game.getPlayerSign(myUid),
 		gameResult: game.gameResult,
+	});
+};
+
+module.exports.getNewUid = (req, res, next) => {
+	let uniqueId =
+		Date.now().toString(36) + Math.random().toString(36).substring(2);
+
+	return res.json({
+		uid: uniqueId,
 	});
 };

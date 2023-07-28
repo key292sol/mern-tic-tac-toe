@@ -1,29 +1,40 @@
 const { generateRoomId, getNewGame } = require('./funcs');
+// const nanoid = require('nanoid');
 
 module.exports.multiPlayerSocket = (io, socket) => {
-	socket.on('create-room', () => {
+	socket.on('create-room', ({ myUid }) => {
 		const roomId = generateRoomId();
 
-		global.roomToGameMap[roomId] = null;
+		const game = getNewGame();
+		global.roomToGameMap[roomId] = game;
+		game.setPlayerX(myUid);
+
 		socket.room = roomId;
 
 		socket.join(roomId);
 		socket.emit('room-id', roomId);
 	});
 
-	socket.on('join-room', (roomId) => {
+	socket.on('join-room', ({ roomId, myUid }) => {
 		const roomExists = roomId in global.roomToGameMap;
 
 		if (!roomExists) {
 			socket.emit('not-joined', false);
 		} else {
-			global.roomToGameMap[roomId] = getNewGame();
+			// global.roomToGameMap[roomId] = getNewGame();
+			let game = global.roomToGameMap[roomId];
+			game.setPlayerO(myUid);
 			socket.room = roomId;
 
 			socket.join(roomId);
 
 			io.sockets.in(roomId).emit('game-start', { gameStart: true });
 		}
+	});
+
+	socket.on('add-to-room', ({ roomId }) => {
+		socket.room = roomId;
+		socket.join(roomId);
 	});
 
 	socket.on('play', ({ roomId, row, col }) => {

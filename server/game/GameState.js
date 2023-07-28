@@ -33,6 +33,12 @@ module.exports = class GameState {
 		return this.players[this.O];
 	}
 
+	getPlayerSign(uid) {
+		if (uid == this.getPlayerX()) return 'X';
+		if (uid == this.getPlayerO()) return 'O';
+		return ' ';
+	}
+
 	playMove(row, col) {
 		try {
 			if (this.board[row][col] !== '') {
